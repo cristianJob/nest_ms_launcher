@@ -1,5 +1,6 @@
 ### Pasos para crear los Git Submodules
 
+docker compose up --build
 
 1. Crear un nuevo repositorio en GitHub
 2. Clonar el repositorio en la máquina local
@@ -28,6 +29,10 @@ git submodule update --remote
 Si se trabaja en el repositorio que tiene los sub-módulos, **primero actualizar y hacer push** en el sub-módulo y **después** en el repositorio principal. 
 
 Si se hace al revés, se perderán las referencias de los sub-módulos en el repositorio principal y tendremos que resolver conflictos.
+
+Para traer los ultimos cambios de todos los sub-módulos se ejecuta el siguiente comando
+
+git submodule update --remote --merge
 
 
 
