@@ -54,5 +54,21 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123456
       - POSTGRES_DB=orders_db 
-    
+
+# PAYMENTS MICROSERVICE    
+  payments-ms:
+    container_name: payments_ms
+    build: ./payments-ms
+    ports:
+      - 3003:3003
+    volumes:
+      - ./payments-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3003
+      - NATS_SERVERS=nats://nats-server:4222
+      - STRIPE_SECRET=
+      - STRIPE_SUCCESS_URL=http://localhost:3003/api/payments/success
+      - STRIPE_CANCEL_URL=http://localhost:3003/api/payments/cancel
+      - STRIPE_ENDPOINT_SECRET=whsec_CRMg0PuJcEzCF6W2SH9YtVmoqNIXLHf5
     
