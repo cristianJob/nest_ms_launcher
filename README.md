@@ -35,6 +35,12 @@ Para traer los ultimos cambios de todos los sub-módulos se ejecuta el siguiente
 git submodule update --remote --merge
 
 
+## Prod
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
 
 
 git submodule add https://github.com/cristianJob/nest_ms_client_gateway.git client-gateway  

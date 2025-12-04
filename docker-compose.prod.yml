@@ -1,0 +1,81 @@
+services:
+  nats-server:
+    image: nats:latest
+    ports:
+      - ${NATS_PORT}:${NATS_PORT}
+
+  client-gateway:
+    build:
+      context: ./client-gateway
+      dockerfile: dockerfile.prod
+    image: client-gateway-prod
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
+    environment:
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - DATABASE_URL=${PRODUCTS_DB_URL}
+      - NATS_SERVERS=${NATS_SERVERS}
+
+  auth-ms:
+    build: 
+      context: ./auth-ms
+      dockerfile: dockerfile.prod
+    image: auth-ms-prod
+    environment:
+      - PORT=${AUTH_MS_PORT}
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=${AUTH_DB_URL}
+      - JWT_SECRET=${JWT_SECRET}
+
+  products-ms:
+    build:
+      context: ./products-ms
+      dockerfile: dockerfile.prod
+    image: products-ms-prod
+    environment:
+      - PORT=${PRODUCTS_MS_PORT}
+      - DATABASE_URL=${PRODUCTS_DB_URL}
+      - NATS_SERVERS=${NATS_SERVERS}
+
+  orders-ms:
+    build: 
+      context: ./orders-ms
+      dockerfile: dockerfile.prod
+    image: orders-ms-prod
+    ports:
+      - ${ORDERS_MS_PORT}:${ORDERS_MS_PORT}
+    environment:
+      - PORT=${ORDERS_MS_PORT}
+      - DATABASE_URL=${ORDER_DATABASE_URL}
+      - NATS_SERVERS=${NATS_SERVERS}
+    depends_on:
+      - orders-db
+
+  orders-db:
+    container_name: orders_database
+    image: postgres:16.2
+    restart: always
+    volumes:
+      - ./orders-ms/postgres:/var/lib/postgresql/data
+    ports:
+      - ${ORDERS_DB_PORT}:${ORDERS_DB_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+  payments-ms:
+    build: 
+      context: ./payments-ms
+      dockerfile: dockerfile.prod
+    image: payments-ms-prod
+    ports:
+      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
+    environment:
+      - PORT=${PAYMENTS_MS_PORT}
+      - NATS_SERVERS=${NATS_SERVERS}
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
+      - STRIPE_ENDPOINT_SECRET=${STRIPE_ENDPOINT_SECRET}
+    
