@@ -7,3 +7,6 @@
 [submodule "products-ms"]
 	path = products-ms
 	url = https://github.com/cristianJob/nest_ms_products.git
+[submodule "auth-ms"]
+	path = auth-ms
+	url = https://github.com/cristianJob/nest_ms_auth.git

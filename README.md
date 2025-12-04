@@ -40,3 +40,4 @@ git submodule update --remote --merge
 git submodule add https://github.com/cristianJob/nest_ms_client_gateway.git client-gateway  
 git submodule add https://github.com/cristianJob/nest_ms_orders.git orders-ms
 git submodule add https://github.com/cristianJob/nest_ms_products.git products-ms
+git submodule add https://github.com/cristianJob/nest_ms_auth.git auth-ms

@@ -2,43 +2,56 @@ services:
   nats-server:
     image: nats:latest
     ports:
-      - 8222:8222
+      - ${NATS_PORT}:${NATS_PORT}
 
   client-gateway:
     build: ./client-gateway
     ports:
-      - 3000:3000
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
     volumes:
       - ./client-gateway/src:/usr/src/app/src
     command: npm run start:dev
     environment:
-      - PORT=3000
-      - DATABASE_URL=sqlite://./dev.db
-      - NATS_SERVERS=nats://nats-server:4222
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - DATABASE_URL=${PRODUCTS_DB_URL}
+      - NATS_SERVERS=${NATS_SERVERS}
+
+  auth-ms:
+    build: ./auth-ms
+    ports:
+      - ${AUTH_MS_PORT}:${AUTH_MS_PORT}
+    volumes:
+      - ./auth-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=${AUTH_MS_PORT}
+      - NATS_SERVERS=${NATS_SERVERS}
+      - DATABASE_URL=${AUTH_DB_URL}
+      - JWT_SECRET=${JWT_SECRET}
 
   products-ms:
     build: ./products-ms
     ports:
-      - 3001:3001
+      - ${PRODUCTS_MS_PORT}:${PRODUCTS_MS_PORT}
     volumes:
       - ./products-ms/src:/usr/src/app/src
     command: npm run start:dev
     environment:
-      - PORT=3001
-      - DATABASE_URL=file:/usr/src/app/dev.db
-      - NATS_SERVERS=nats://nats-server:4222
+      - PORT=${PRODUCTS_MS_PORT}
+      - DATABASE_URL=${PRODUCTS_DB_URL}
+      - NATS_SERVERS=${NATS_SERVERS}
 
   orders-ms:
     build: ./orders-ms
     ports:
-      - 3002:3002
+      - ${ORDERS_MS_PORT}:${ORDERS_MS_PORT}
     volumes:
       - ./orders-ms/src:/usr/src/app/src
     command: npm run start:dev
     environment:
-      - PORT=3002
-      - DATABASE_URL=postgresql://postgres:123456@orders-db:5432/orders_db?schema=public
-      - NATS_SERVERS=nats://nats-server:4222
+      - PORT=${ORDERS_MS_PORT}
+      - DATABASE_URL=${ORDER_DATABASE_URL}
+      - NATS_SERVERS=${NATS_SERVERS}
     depends_on:
       - orders-db
 
@@ -49,26 +62,25 @@ services:
     volumes:
       - ./orders-ms/postgres:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - ${ORDERS_DB_PORT}:${ORDERS_DB_PORT}
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB=orders_db 
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
 
-# PAYMENTS MICROSERVICE    
   payments-ms:
     container_name: payments_ms
     build: ./payments-ms
     ports:
-      - 3003:3003
+      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
     volumes:
       - ./payments-ms/src:/usr/src/app/src
     command: npm run start:dev
     environment:
-      - PORT=3003
-      - NATS_SERVERS=nats://nats-server:4222
-      - STRIPE_SECRET=
-      - STRIPE_SUCCESS_URL=http://localhost:3003/api/payments/success
-      - STRIPE_CANCEL_URL=http://localhost:3003/api/payments/cancel
-      - STRIPE_ENDPOINT_SECRET=whsec_CRMg0PuJcEzCF6W2SH9YtVmoqNIXLHf5
+      - PORT=${PAYMENTS_MS_PORT}
+      - NATS_SERVERS=${NATS_SERVERS}
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
+      - STRIPE_ENDPOINT_SECRET=${STRIPE_ENDPOINT_SECRET}
     
