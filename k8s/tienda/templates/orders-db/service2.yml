@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: orders-db-nodeport
+  name: orders-db-nodeport
+spec:
+  ports:
+  - name: "5432"
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: orders-db
+  type: NodePort
+status:
+  loadBalancer: {}

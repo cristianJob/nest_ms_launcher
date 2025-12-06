@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: payments-ms
+  name: payments-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-ms
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: payments-ms
+    spec:
+      containers:
+      - image: payments-ms-prod
+        name: payments-ms-prod
+        imagePullPolicy: Never   # <--- usa las imágenes locales y no las de docker hub o de la web
+        ports:
+        - containerPort: 3003
+        env:
+        - name: PORT
+          value: "3003"
+        - name: NATS_SERVERS
+          value: "nats://nats"
+        - name: STRIPE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: payments-secret
+              key: STRIPE_SECRET
+        - name: STRIPE_SUCCESS_URL
+          value: "http://localhost:31455/api/payments/success"
+        - name: STRIPE_CANCEL_URL
+          value: "http://localhost:31455/api/payments/cancel"
+        - name: STRIPE_ENDPOINT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: payments-secret
+              key: STRIPE_ENDPOINT_SECRET
+
+        resources: {}
+status: {}

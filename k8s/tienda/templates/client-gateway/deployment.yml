@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: client-gateway
+  name: client-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-gateway
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: client-gateway
+    spec:
+      containers:
+      - image: client-gateway-prod
+        name: client-gateway-prod
+        imagePullPolicy: Never   # <--- usa las imágenes locales y no las de docker hub o de la web
+        env:
+        - name: PORT
+          value: "3000"
+        - name: DATABASE_URL
+          value: "file:/usr/src/app/dev.db"
+        - name: NATS_SERVERS
+          value: "nats://nats"
+        resources: {}
+status: {}

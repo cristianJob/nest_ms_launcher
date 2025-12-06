@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: orders-db
+  name: orders-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders-db
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: orders-db
+    spec:
+      containers:
+      - image: postgres:16.2
+        name: postgres
+        imagePullPolicy: Never   # <--- usa las imágenes locales y no las de docker hub o de la web
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "123456"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "orders_db"
+        resources: {}
+status: {}
